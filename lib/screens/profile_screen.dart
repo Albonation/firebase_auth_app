@@ -47,10 +47,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _message = null;
     });
 
+    debugPrint(
+      '[PROF] Attempting to update password for user: ${_authService.currentUser?.email}',
+    );
+
     try {
       await _authService.changePassword(newPassword);
       _newPasswordController.clear();
 
+      debugPrint(
+        '[PROF] Password updated successfully for user: ${_authService.currentUser?.email}',
+      );
       setState(() {
         _message = 'Password updated successfully.';
       });
@@ -62,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             break;
           case 'requires-recent-login':
             _message =
-            'Please sign out and sign in again before changing your password.';
+                'Please sign out and sign in again before changing your password.';
             break;
           default:
             _message = e.message ?? 'Password update failed.';
@@ -78,20 +85,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _isUpdatingPassword = false;
         });
       }
+      debugPrint(
+        '[PROF] Finished password update attempt for user: ${_authService.currentUser?.email}',
+      );
     }
   }
 
   //sign out the user using auth service and navigate back to authentication screen
   //this method also removes all previous screens on the stack
   Future<void> _signOut() async {
+    debugPrint(
+      '[PROF] Attempting to sign out user: ${_authService.currentUser?.email}',
+    );
     await _authService.signOut();
+    debugPrint(
+      '[PROF] Sign out successful for user: ${_authService.currentUser?.email}',
+    );
 
     if (!mounted) return;
 
+    debugPrint(
+      '[PROF] Navigating to AuthenticationScreen via pushAndRemoveUntil after sign out',
+    );
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const AuthenticationScreen()),
-          (route) => false,
+      (route) => false,
     );
   }
 
@@ -166,10 +185,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: _isUpdatingPassword ? null : _changePassword,
                       child: _isUpdatingPassword
                           ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
                           : const Text('Update Password'),
                     ),
                     const SizedBox(height: 12),

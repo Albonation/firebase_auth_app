@@ -75,12 +75,19 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
 
   //handle form submission for both login and registration, set loading state and error messages
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      debugPrint('[AUTH] Form validation failed');
+      return;
+    }
 
     setState(() {
       _isLoading = true;
       _message = null;
     });
+
+    debugPrint(
+      '[AUTH] Attempting to ${_isLogin ? 'sign in' : 'register'} with email: ${_emailController.text}',
+    );
 
     try {
       if (_isLogin) {
@@ -88,16 +95,21 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
+        debugPrint('[AUTH] Sign in successful for email: ${_emailController.text}');
       } else {
         await _authService.register(
           email: _emailController.text,
           password: _passwordController.text,
+        );
+        debugPrint(
+          '[AUTH] Registration successful for email: ${_emailController.text}',
         );
       }
 
       if (!mounted) return;
 
       //go to profile screen but replace the current screen so user cannot go back to login
+      debugPrint('[AUTH] Navigating to ProfileScreen via pushReplacement');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const ProfileScreen()),
@@ -116,6 +128,9 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
           _isLoading = false;
         });
       }
+      debugPrint(
+        '[AUTH] Authentication process completed for email: ${_emailController.text}',
+      );
     }
   }
 
@@ -127,6 +142,8 @@ class _AuthenticationScreenState extends State<AuthenticationScreen> {
       _formKey.currentState?.reset();
       _passwordController.clear();
     });
+
+    debugPrint('[AUTH] Auth mode switched to ${_isLogin ? 'Sign In' : 'Register'}');
   }
 
   //UI with a form for email and password
